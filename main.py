@@ -43,4 +43,6 @@ for contribuyente in contribuyentes:
         seleccionar_servicio(driver)
         generar_vep(driver, contribuyente)
 
-        time.sleep(5)
+        time.sleep(1)
+
+        driver.close()

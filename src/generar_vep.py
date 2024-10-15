@@ -1,9 +1,8 @@
 import time
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 import random
 
@@ -27,6 +26,21 @@ def generar_vep(driver, contribuyente):
 
     seleccionar_medio_de_pago(driver, contribuyente.datos_vep.medio_de_pago)
 
+    # confirmar vep
+    generar_vep_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[text()='Aceptar']"))
+    )
+    generar_vep_button.click()
+
+    # descargar pdf
+    export_link = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//span[text()='picture_as_pdf']"))
+    )
+    driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", export_link)
+    time.sleep(random.randint(1, 2))
+    driver.execute_script("arguments[0].click();", export_link)
+
+
 
 def click_siguiente_dos(driver):
     XPATH_SIGUIENTE = ("//button[contains(@class, 'btn') and contains(@class, 'e-button') and contains(@class, "
@@ -37,7 +51,7 @@ def click_siguiente_dos(driver):
     while True:
         try:
             button = wait.until(EC.element_to_be_clickable((By.XPATH, XPATH_SIGUIENTE)))
-            time.sleep(random.randint(1, 3))
+            time.sleep(random.randint(1, 2))
             button.click()
             break  # Si el clic es exitoso, salir del bucle
 
@@ -52,9 +66,10 @@ def seleccionar_medio_de_pago(driver, medio_de_pago):
 
     wait = WebDriverWait(driver, 10)
     button = wait.until(EC.element_to_be_clickable((By.ID, ID_MEDIO_DE_PAGO)))
+    driver.execute_script("arguments[0].scrollIntoView();", button)
 
-    time.sleep(random.randint(1, 3))
-
+    time.sleep(random.randint(1, 2))
+    
     button.click()
 
 
@@ -68,12 +83,12 @@ def seleccionar_periodo_fiscal(driver, periodo_fiscal):
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
     # dropdown_input.send_keys(periodo_fiscal)
 
@@ -83,7 +98,7 @@ def seleccionar_periodo_fiscal(driver, periodo_fiscal):
     for option in dropdown_options:
 
         if option.text == periodo_fiscal:
-            time.sleep(random.randint(1, 3))
+            time.sleep(random.randint(1, 2))
             try:
                 option.click()
                 break
@@ -104,12 +119,12 @@ def seleccionar_anio_fiscal(driver, anio_fiscal):
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_options = dropdown_input.find_elements(By.XPATH, option_xpath)
@@ -117,7 +132,7 @@ def seleccionar_anio_fiscal(driver, anio_fiscal):
     for option in dropdown_options:
 
         if option.text == anio_fiscal:
-            time.sleep(random.randint(1, 3))
+            time.sleep(random.randint(1, 2))
             try:
 
                 option.click()
@@ -139,12 +154,12 @@ def seleccionar_categoria(driver, categoria):
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_options = dropdown_input.find_elements(By.XPATH, option_xpath)
@@ -152,7 +167,7 @@ def seleccionar_categoria(driver, categoria):
     for option in dropdown_options:
 
         if option.text == categoria:
-            time.sleep(random.randint(1, 3))
+            time.sleep(random.randint(1, 2))
             try:
                 driver.execute_script("arguments[0].scrollIntoView(true);", option)
                 time.sleep(2)
