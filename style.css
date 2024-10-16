@@ -1,0 +1,32 @@
+/* style.css */
+body {
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.stButton > button {
+    color: #ffffff;
+    background-color: #4CAF50;
+    border: none;
+    padding: 10px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition-duration: 0.4s;
+}
+
+.stButton > button:hover {
+    background-color: #45a049;
+}
+
+.stProgress > div > div > div > div {
+    background-color: #4CAF50;
+}
+
+.css-1v0mbdj.etr89bj1 {
+    width: 100%;
+}

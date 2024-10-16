@@ -16,29 +16,39 @@ def generar_vep(driver, contribuyente):
     seleccionar_grupo_tipo_pago(driver, contribuyente.datos_vep.grupo_de_tipo_pago)
     seleccionar_tipo_pago(driver, contribuyente.datos_vep.tipo_pago)
     click_siguiente(driver)
-
+    print('Seleccionando periodo ...')
     seleccionar_periodo_fiscal(driver, contribuyente.datos_vep.periodo_fiscal)
+
+    print('Seleccionando año ...')
     seleccionar_anio_fiscal(driver, contribuyente.datos_vep.anio_fiscal)
+
+    print('Seleccionando categoria ...')
     seleccionar_categoria(driver, contribuyente.datos_vep.categoria)
+
+    print('Click siguiennte ...')
     click_siguiente_datos_periodo(driver)
 
+    print('Click siguiennte dos ...')
     click_siguiente_dos(driver)
 
+    print('Seleccionando medio de pago ...')
     seleccionar_medio_de_pago(driver, contribuyente.datos_vep.medio_de_pago)
 
+    print('Confirmando VEP ...')
     # confirmar vep
     generar_vep_button = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//button[text()='Aceptar']"))
     )
     generar_vep_button.click()
 
+    print('Descargando VEP Generado ...')
     # descargar pdf
     export_link = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//span[text()='picture_as_pdf']"))
     )
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", export_link)
     time.sleep(random.randint(1, 2))
-    driver.execute_script("arguments[0].click();", export_link)
+    export_link.click()
 
 
 
@@ -197,7 +207,7 @@ def click_siguiente(driver):
     wait = WebDriverWait(driver, 10)
     button = wait.until(EC.element_to_be_clickable((By.XPATH, XPATH_SIGUIENTE)))
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
 
     button.click()
 
@@ -212,12 +222,12 @@ def seleccionar_tipo_pago(driver, tipo_pago):
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     # Corregir la expresión XPath para encontrar los elementos li dentro del dropdown
@@ -225,7 +235,7 @@ def seleccionar_tipo_pago(driver, tipo_pago):
 
     for option in dropdown_options:
         if option.text == tipo_pago:
-            time.sleep(random.randint(1, 3))
+            time.sleep(random.randint(1, 2))
             option.click()
             break
 
@@ -240,12 +250,12 @@ def seleccionar_grupo_tipo_pago(driver, grupo_tipo_pago):
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     dropdown_input = label.find_element(By.XPATH, dropdown_xpath)
 
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 2))
     dropdown_input.click()
 
     # Corregir la expresión XPath para encontrar los elementos li dentro del dropdown
@@ -253,7 +263,7 @@ def seleccionar_grupo_tipo_pago(driver, grupo_tipo_pago):
 
     for option in dropdown_options:
         if option.text == grupo_tipo_pago:
-            time.sleep(random.randint(1, 3))
+            time.sleep(random.randint(1, 2))
             option.click()
             break
 

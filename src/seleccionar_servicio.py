@@ -4,9 +4,22 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def seleccionar_servicio(browser):
-    _hacer_click_en_ver_todos(browser)
-    _hacer_click_en_servicio(browser)
+def seleccionar_servicio(browser, nombre_servicio):
+
+    print('Click en buscador de servicio ...')
+    selector_servicio_input = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, 'buscadorInput')))
+    selector_servicio_input.send_keys(nombre_servicio)
+
+    SERVICIO_XPATH = f"//p[contains(text(), '{nombre_servicio}')]"
+
+    print(f'Escribiendo nombre_servicio: {nombre_servicio}')
+    servicio_button = WebDriverWait(browser, 20).until(EC.visibility_of_element_located(
+        (By.XPATH, SERVICIO_XPATH)))
+    
+    servicio_button.click()
+    
+    # _hacer_click_en_ver_todos(browser)
+    # _hacer_click_en_servicio(browser)
     time.sleep(2)
 
 
