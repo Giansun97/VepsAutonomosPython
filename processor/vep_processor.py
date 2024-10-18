@@ -49,6 +49,7 @@ def generar_vep(driver, contribuyente):
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", export_link)
     time.sleep(random.randint(1, 2))
     export_link.click()
+    print('VEP descargado Exitosamente ...')
 
 
 

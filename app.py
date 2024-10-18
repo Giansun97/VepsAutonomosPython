@@ -80,12 +80,12 @@ if uploaded_file is not None:
             st.success("VEPS generados exitosamente.")
 
             # Aquí se puede agregar la lógica para descargar los VEPS generados
-            st.download_button(
-                label="Descargar VEPS generados",
-                data="datos_de_veps_generados.zip",  # Reemplazar con los datos reales
-                file_name="veps_generados.zip",
-                mime="application/zip"
-            )
+            # st.download_button(
+            #     label="Descargar VEPS generados",
+            #     data="datos_de_veps_generados.zip",  # Reemplazar con los datos reales
+            #     file_name="veps_generados.zip",
+            #     mime="application/zip"
+            # )
 
     except Exception as e:
         st.error(f"Error al procesar el archivo: {e}")

@@ -1,9 +1,9 @@
 import os
-from src.inicializar_navegador import inicializar_navegador
-from src.ingresar_afip import ingresar_credenciales
-from src.seleccionar_servicio import seleccionar_servicio
-from src.obtener_contribuyentes_a_procesar import get_contribuyentes
-from src.generar_vep import generar_vep
+from utils.selenium_utils import inicializar_navegador
+from ingresar_afip_service import ingresar_credenciales
+from utils.afip_utils import seleccionar_servicio
+from processor.contribuyentes_processor import get_contribuyentes
+from processor.vep_processor import generar_vep
 from utils import constants
 import pandas as pd
 import time
@@ -47,5 +47,5 @@ def vep_generation_service(df):
             generar_vep(driver, contribuyente)
 
             time.sleep(1)
-
+            
             driver.close()
