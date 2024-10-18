@@ -6,13 +6,13 @@ import os
 
 
 def configurar_opciones_chrome():
-    ubicacion_temporal = os.path.abspath(constants.UBICACION_TEMPORAL)
+    # ubicacion_temporal = os.path.abspath(constants.UBICACION_TEMPORAL)
 
     chrome_options = webdriver.ChromeOptions()
 
     chrome_options.add_experimental_option(
         "prefs", {
-            "download.default_directory": ubicacion_temporal,
+            # "download.default_directory": ubicacion_temporal,
             "download.prompt_for_download": False,
             "profile.managed_default_content_settings.images": 2,
             "download.directory_upgrade": True,
@@ -29,6 +29,7 @@ def configurar_opciones_chrome():
 
 def inicializar_navegador():
     chrome_options = configurar_opciones_chrome()
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    service = Service(executable_path="chromedriver.exe")
+    # driver = webdriver.Chrome(service=service, options=chrome_options)    
+    driver = webdriver.Chrome(service=service, options=chrome_options) 
     return driver
