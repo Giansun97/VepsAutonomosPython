@@ -1,7 +1,8 @@
 import time
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 import random
@@ -19,7 +20,23 @@ def generar_vep(driver, contribuyente):
 
     seleccionar_periodo_fiscal(driver, contribuyente.datos_vep.periodo_fiscal)
     seleccionar_anio_fiscal(driver, contribuyente.datos_vep.anio_fiscal)
-    seleccionar_categoria(driver, contribuyente.datos_vep.categoria)
+
+    if contribuyente.datos_vep.grupo_de_tipo_pago == "Autonomo":
+        seleccionar_categoria(driver, contribuyente.datos_vep.categoria)
+
+    time.sleep(0.5)
+    try:
+        # Hacer clic en un área vacía para cerrar cualquier menú abierto
+        actions = ActionChains(driver)
+        actions.move_by_offset(10, 10).click().perform()
+        actions.reset_actions()
+    except Exception:
+        pass
+
+    if contribuyente.datos_vep.grupo_de_tipo_pago in ["Monotributo", "Monotributo Unificado"]:
+        if hasattr(contribuyente, 'cur') and contribuyente.cur:
+            ingresar_cur(driver, contribuyente.cur)
+
     click_siguiente_datos_periodo(driver)
 
     click_siguiente_dos(driver)
@@ -40,6 +57,71 @@ def generar_vep(driver, contribuyente):
     time.sleep(random.randint(1, 2))
     driver.execute_script("arguments[0].click();", export_link)
 
+
+def ingresar_cur(driver, cur):
+    """
+    Función para ingresar el CUR en el campo correspondiente,
+    manejando elementos interceptados
+    
+    Args:
+        driver: El WebDriver de Selenium
+        cur (str): El CUR a ingresar
+    """
+    try:
+        # Esperar a que cualquier menú desplegable o diálogo se cierre
+        time.sleep(1)
+        
+        # Intentar cerrar cualquier elemento interceptor (como menús desplegables)
+        try:
+            # Hacer clic en un área vacía para cerrar cualquier menú abierto
+            actions = ActionChains(driver)
+            actions.move_by_offset(10, 10).click().perform()
+            actions.reset_actions()
+            time.sleep(0.5)
+        except Exception:
+            pass
+        
+        # Esperar a que el campo esté disponible
+        wait = WebDriverWait(driver, 10)
+        xpath = "//div[./label[text()='CUR']]//input[@class='e-input form-control']"
+        campo_cur = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+        
+        # Intentar hacer scroll al elemento para asegurarnos de que es visible
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", campo_cur)
+        time.sleep(0.5)
+        
+        # Intento 1: Usar ActionChains para moverse al elemento y hacer clic
+        try:
+            actions = ActionChains(driver)
+            actions.move_to_element(campo_cur).click().send_keys(cur).perform()
+            print(f"CUR {cur} ingresado correctamente con ActionChains")
+            return True
+        except ElementClickInterceptedException:
+            print("Primer intento fallido, probando método alternativo")
+        
+        # Intento 2: Usar JavaScript para establecer el valor directamente
+        try:
+            driver.execute_script("arguments[0].value = arguments[1];", campo_cur, cur)
+            print(f"CUR {cur} ingresado correctamente con JavaScript")
+            return True
+        except Exception as e:
+            print(f"Segundo intento fallido: {str(e)}")
+        
+        # Intento 3: Esperar a que sea clickeable y luego hacer clic normal
+        try:
+            campo_cur = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            campo_cur.click()
+            campo_cur.clear()
+            campo_cur.send_keys(cur)
+            print(f"CUR {cur} ingresado correctamente con método estándar")
+            return True
+        except Exception as e:
+            print(f"Tercer intento fallido: {str(e)}")
+            raise e
+        
+    except Exception as e:
+        print(f"Error al ingresar el CUR: {str(e)}")
+        return False
 
 
 def click_siguiente_dos(driver):
@@ -75,6 +157,7 @@ def seleccionar_medio_de_pago(driver, medio_de_pago):
 
 def seleccionar_periodo_fiscal(driver, periodo_fiscal):
     seleccionar_opcion_dropdown(driver, "PERIODO FISCAL Mes", periodo_fiscal)
+
 
 def seleccionar_anio_fiscal(driver, anio_fiscal):
     wait = WebDriverWait(driver, 10)
@@ -242,14 +325,47 @@ def seleccionar_categoria(driver, categoria):
 
 
 def click_siguiente_datos_periodo(driver):
-    XPATH_SIGUIENTE = "//button[normalize-space()='Siguiente']"
-    
-    wait = WebDriverWait(driver, 10)
-    button = wait.until(EC.element_to_be_clickable((By.XPATH, XPATH_SIGUIENTE)))
-
-    time.sleep(random.randint(1, 3))
-
-    button.click()
+    """
+    Función para hacer clic en el botón Siguiente después de ingresar los datos del período
+    con manejo de elementos interceptados
+    """
+    try:
+        # Esperamos a que el botón esté disponible
+        wait = WebDriverWait(driver, 10)
+        button = wait.until(
+            EC.presence_of_element_located((By.XPATH, "//button[text()='Siguiente']"))
+        )
+        
+        # Scroll para asegurarnos de que el botón esté en el viewport
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", button)
+        time.sleep(1)  # Dar tiempo para que el scroll termine
+        
+        # Intento 1: Clic normal
+        try:
+            button.click()
+            return
+        except Exception as e:
+            print(f"No se pudo hacer clic normal en Siguiente: {str(e)}")
+        
+        # Intento 2: Usar ActionChains
+        try:
+            actions = ActionChains(driver)
+            actions.move_to_element(button).click().perform()
+            return
+        except Exception as e:
+            print(f"No se pudo hacer clic con ActionChains en Siguiente: {str(e)}")
+        
+        # Intento 3: JavaScript click como último recurso
+        try:
+            driver.execute_script("arguments[0].click();", button)
+            return
+        except Exception as e:
+            print(f"No se pudo hacer clic con JavaScript en Siguiente: {str(e)}")
+            raise e
+            
+    except Exception as e:
+        print(f"Error al hacer clic en Siguiente datos período: {str(e)}")
+        raise e
 
 
 def click_siguiente(driver):
@@ -301,7 +417,6 @@ def seleccionar_tipo_pago(driver, tipo_pago):
     print(f"No se encontró la opción: {tipo_pago}")
 
 
-
 def seleccionar_grupo_tipo_pago(driver, grupo_tipo_pago):
     label_xpath = "//label[text()='Grupos de Tipos de Pagos']"
     dropdown_xpath = ".//following-sibling::div//span[contains(@class, 'icon-multiselect')]"
@@ -338,7 +453,6 @@ def seleccionar_grupo_tipo_pago(driver, grupo_tipo_pago):
             return
 
     print(f"No se encontró la opción: {grupo_tipo_pago}")
-
 
 
 def seleccionar_cuit_contribuyente(driver, contribuyente):

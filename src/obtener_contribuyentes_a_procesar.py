@@ -22,6 +22,7 @@ def get_contribuyentes(df):
                 filtro=row['Procesar?'],
                 usuario=row['CuitIngreso'],
                 password=row['Clave'],
+                cur=row['CUR'],
                 datos_vep=datos_vep
             )
 

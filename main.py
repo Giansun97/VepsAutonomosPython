@@ -10,13 +10,14 @@ import time
 
 df = pd.read_excel(
     './data/INPUT_DATOS_VEPS.xlsx',
-    usecols='A:K',
+    usecols='A:L',
     skiprows=1,
     dtype={
         'CuitIngreso': str,
         'CuitContribuyente': str,
         'PERIODO FISCAL Mes': str,
-        'PERIODO FISCAL Año': str
+        'PERIODO FISCAL Año': str,
+        'CUR': str
     }
 )
 
