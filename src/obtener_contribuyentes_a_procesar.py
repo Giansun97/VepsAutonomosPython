@@ -20,6 +20,8 @@ def get_contribuyentes(df):
                 cuit_contribuyente=str(row['CuitContribuyente']),
                 cliente=row['Nombre'],
                 filtro=row['Procesar?'],
+                mail=row['MailCliente'],
+                envio_mail=row['Enviar Mail?'],
                 usuario=row['CuitIngreso'],
                 password=row['Clave'],
                 cur=row['CUR'],

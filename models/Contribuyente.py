@@ -1,12 +1,14 @@
 class Contribuyente:
-    def __init__(self, cuit_contribuyente, cliente, usuario, password, cur, filtro, datos_vep):
+    def __init__(self, cuit_contribuyente, cliente, usuario, mail, password, cur, filtro, envio_mail, datos_vep):
 
         self.cuit_contribuyente = cuit_contribuyente
         self.cliente = cliente
         self.usuario = usuario
+        self.mail = mail
         self.password = password
         self.cur = cur
         self.filtro = filtro
+        self.envio_mail = envio_mail
         self.datos_vep = datos_vep
 
     def __str__(self):

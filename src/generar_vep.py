@@ -6,6 +6,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 import random
+from utils import constants
+import os
 
 
 def generar_vep(driver, contribuyente):
@@ -57,6 +59,49 @@ def generar_vep(driver, contribuyente):
     time.sleep(random.randint(1, 2))
     driver.execute_script("arguments[0].click();", export_link)
 
+    time.sleep(random.randint(3, 5))
+    download_folder = os.path.abspath(os.path.join(constants.UBICACION_TEMPORAL, "veps"))
+    print(f"Directorio de búsqueda: {download_folder}")
+
+    if hasattr(contribuyente, 'cuit_contribuyente'):
+        download_folder = os.path.join(download_folder, f"{contribuyente.cuit_contribuyente}")
+        print(f"Buscando PDFs en: {download_folder}")
+    
+    if not os.path.exists(download_folder):
+        print(f"¡ADVERTENCIA! La carpeta {download_folder} no existe.")
+    
+    print(f"Archivos en {download_folder}:")
+    if os.path.exists(download_folder):
+        for file in os.listdir(download_folder):
+            print(f"  - {file}")
+
+    # Valor predeterminado para new_path en caso de que no se encuentren PDFs
+    new_path = None
+    
+    # Buscar el último archivo PDF descargado en esa carpeta
+    pdf_files = [f for f in os.listdir(download_folder) if f.endswith('.pdf')]
+    if pdf_files:
+        # Ordenar por fecha de modificación (el más reciente primero)
+        pdf_files.sort(key=lambda x: os.path.getmtime(os.path.join(download_folder, x)), reverse=True)
+        latest_pdf = pdf_files[0]
+        pdf_path = os.path.join(download_folder, latest_pdf)
+        
+        # Renombrar el archivo si es necesario para tener un formato consistente
+        new_filename = f"VEP_{contribuyente.cuit_contribuyente}_{contribuyente.datos_vep.periodo_fiscal}_{contribuyente.datos_vep.anio_fiscal}.pdf"
+        new_path = os.path.join(download_folder, new_filename)
+        
+        if pdf_path != new_path:
+            try:
+                os.rename(pdf_path, new_path)
+                pdf_path = new_path
+            except Exception as e:
+                print(f"Error al renombrar archivo: {str(e)}")
+                # Si hay un error al renombrar, usamos la ruta original
+                new_path = pdf_path
+    else:
+        print("No se encontraron archivos PDF en la carpeta de descarga.")
+
+    return new_path
 
 def ingresar_cur(driver, cur):
     """
